@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #333;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #007bff;
+        }
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .result.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .result.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .btn-predict {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Sales Prediction</h1>
+        <p>Enter your advertising spend values below to predict the sales amount.</p>
+        <form id="predictForm">
+            <label for="TV">TV Advertising Spend (in thousands $):</label>
+            <input type="number" id="TV" name="TV" required><br><br>
+            <label for="Radio">Radio Advertising Spend (in thousands $):</label>
+            <input type="number" id="Radio" name="Radio" required><br><br>
+            <label for="Newspaper">Newspaper Advertising Spend (in thousands $):</label>
+            <input type="number" id="Newspaper" name="Newspaper" required><br><br>
+            <button type="button" class="btn-predict" onclick="predict()">Predict</button>
+        </form>
+        <div id="result" class="result"></div>
+    </div>
+    <div class="footer">
+        Developed by Sheema Masood
+    </div>
+    <script>
+        async function predict() {
+            const TV = parseFloat(document.getElementById('TV').value);
+            const Radio = parseFloat(document.getElementById('Radio').value);
+            const Newspaper = parseFloat(document.getElementById('Newspaper').value);
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ TV, Radio, Newspaper })
+            });
+
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+
+            if (data.error) {
+                resultDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
+                resultDiv.className = 'result error';
+            } else {
+                const predicted_sales = data.predicted_sales.toFixed(2); // No division needed
+                resultDiv.innerHTML = `Based on your advertising budget, we predict your sales to be around: <strong>$${predicted_sales}K</strong>.`;
+                resultDiv.className = 'result success';
+            }
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

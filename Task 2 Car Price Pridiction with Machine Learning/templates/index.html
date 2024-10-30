@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Estimator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('{{ url_for('static', filename='car.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #000000;
+        }
+        .container {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #000000; /* Black border */
+            text-align: center;
+            width: 90%;
+            max-width: 800px;
+            color: #000000; /* Text color */
+        }
+        h1 {
+            color: #000000; /* Heading color */
+            margin-bottom: 20px;
+            font-size: 28px; /* Adjust heading size */
+            font-weight: bold; /* Bold text */
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .form-row > div {
+            flex: 1 1 calc(50% - 20px);
+            margin: 10px;
+            box-sizing: border-box;
+        }
+        .form-row label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #000000; /* Label color */
+        }
+        .form-row input,
+        .form-row select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.8); /* Slightly transparent background for inputs */
+            color: #000000; /* Input text color */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #000000; /* Black text color for result */
+            font-weight: bold; /* Bold text for result */
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 20px; /* Increased font size for footer */
+            color: #000000; /* Keep the footer text color unchanged */
+            font-weight: bold; /* Bold text for footer */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Car Price Estimator</h1>
+        <form method="POST">
+            <div class="form-row">
+                <div>
+                    <label for="present_price">Present Price (in thousand dollars):</label>
+                    <input type="number" id="present_price" name="present_price" step="0.01" value="{{ request.form.get('present_price', '') }}" required>
+                </div>
+                <div>
+                    <label for="driven_kms">Driven Kilometers:</label>
+                    <input type="number" id="driven_kms" name="driven_kms" step="1" value="{{ request.form.get('driven_kms', '') }}" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label for="year">Year of Manufacture:</label>
+                    <input type="number" id="year" name="year" min="1990" max="2024" step="1" value="{{ request.form.get('year', '') }}" required>
+                </div>
+                <div>
+                    <label for="fuel_type">Fuel Type:</label>
+                    <select id="fuel_type" name="fuel_type" required>
+                        <option value="">Select</option>
+                        <option value="Petrol" {% if request.form.get('fuel_type') == 'Petrol' %}selected{% endif %}>Petrol</option>
+                        <option value="Diesel" {% if request.form.get('fuel_type') == 'Diesel' %}selected{% endif %}>Diesel</option>
+                        <option value="CNG" {% if request.form.get('fuel_type') == 'CNG' %}selected{% endif %}>CNG</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label for="selling_type">Selling Type:</label>
+                    <select id="selling_type" name="selling_type" required>
+                        <option value="">Select</option>
+                        <option value="Dealer" {% if request.form.get('selling_type') == 'Dealer' %}selected{% endif %}>Dealer</option>
+                        <option value="Individual" {% if request.form.get('selling_type') == 'Individual' %}selected{% endif %}>Individual</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="transmission">Transmission:</label>
+                    <select id="transmission" name="transmission" required>
+                        <option value="">Select</option>
+                        <option value="Manual" {% if request.form.get('transmission') == 'Manual' %}selected{% endif %}>Manual</option>
+                        <option value="Automatic" {% if request.form.get('transmission') == 'Automatic' %}selected{% endif %}>Automatic</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label for="owner">Number of Previous Owners:</label>
+                    <input type="number" id="owner" name="owner" min="0" max="4" value="{{ request.form.get('owner', '') }}" required>
+                </div>
+            </div>
+            <button type="submit">Calculate Estimated Price</button>
+        </form>
+        
+        {% if predicted_price is not none %}
+        <div class="result">
+            <p>The estimated price of the car with the above details is ${{ predicted_price | round(2) }} thousand.</p>
+        </div>
+        {% endif %}
+        
+        <footer>
+            <p>Developed by Sheema Masood</p>
+        </footer>
+    </div>
+</body>
+</html>
